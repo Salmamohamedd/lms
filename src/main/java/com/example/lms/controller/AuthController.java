@@ -3,6 +3,7 @@ package com.example.lms.controller;
 import com.example.lms.model.AuthModel;
 import com.example.lms.model.User;
 import com.example.lms.service.UserService;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,4 +36,5 @@ public class AuthController {
     public ResponseEntity<User> register(@RequestBody User user){
         return new ResponseEntity<>(service.createUser(user), HttpStatus.CREATED);
     }
+
 }
