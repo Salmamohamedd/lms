@@ -1,5 +1,6 @@
 package com.example.lms.service;
 
+import com.example.lms.model.Role;
 import com.example.lms.model.User;
 import com.example.lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class UserServiceImp implements UserService{
         if(userRepository.findByEmail(user.getEmail()).isPresent()){
             throw new RuntimeException("Email already exists");
         }
+        user.setRole(user.getRole());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

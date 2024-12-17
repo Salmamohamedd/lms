@@ -23,7 +23,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable()) // there is no session on the server side (stateless), CSRF protection doesn't apply
-                .authorizeHttpRequests(request -> request.requestMatchers("/login", "/register").permitAll() // Allows unrestricted (public) access to the /login and /register endpoints.
+                .authorizeHttpRequests(request -> request.
+                        requestMatchers("/login", "/register").permitAll() // Allows unrestricted (public) access to the /login and /register endpoints.
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()) // Ensures that every other request to the server requires authentication
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults()) // HTTP Basic Authentication
