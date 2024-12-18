@@ -4,13 +4,16 @@ package com.example.lms.controller;
 import com.example.lms.model.Assessment;
 import com.example.lms.model.Question;
 import com.example.lms.service.AssessmentService;
+import com.example.lms.service.CourseService;
 import com.example.lms.service.QuestionService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import com.example.lms.model.Lesson;
+import com.example.lms.model.Course;
+import com.example.lms.service.CourseService;
 @RestController
 @RequestMapping("/api/instructors")
 public class InstructorController {
@@ -20,6 +23,9 @@ public class InstructorController {
 
     @Autowired
     private QuestionService questionService;
+
+    @Autowired
+    private CourseService courseService;
 
     @PostMapping("/assessments/create")
     @RolesAllowed({"INSTRUCTOR"})
@@ -62,4 +68,41 @@ public class InstructorController {
     public Question updateQuestion(@PathVariable Long questionId, @RequestBody Question updatedQuestion) {
         return questionService.updateQuestion(questionId, updatedQuestion);
     }
+
+    ///////////////
+
+    // Course-related endpoints
+    @PostMapping("/courses/create")
+    @RolesAllowed({"INSTRUCTOR"})
+    public Course createCourse(@RequestBody Course course) {
+        return courseService.createCourse(course);
+    }
+
+    @PostMapping("/courses/{courseId}/lessons/add")
+    @RolesAllowed({"INSTRUCTOR"})
+    public Lesson addLesson(@PathVariable Long courseId, @RequestBody Lesson lesson) {
+        return courseService.addLessonToCourse(courseId, lesson);
+    }
+
+    @DeleteMapping("/courses/{courseId}/lessons/delete/{lessonId}")
+    @RolesAllowed({"INSTRUCTOR"})
+    public void deleteLesson(@PathVariable Long courseId, @PathVariable Long lessonId) {
+        courseService.deleteLessonFromCourse(courseId, lessonId);
+    }
+
+    @GetMapping("/courses/{courseId}/studentsEnrolled")
+    @RolesAllowed({"INSTRUCTOR"})
+    public List<String> getEnrolledStudents(@PathVariable Long courseId) {
+        return courseService.getEnrolledStudents(courseId);
+    }
+
+    @PostMapping("/courses/{courseId}/lessons/{lessonId}/generateOtp")
+    @RolesAllowed({"INSTRUCTOR"})
+    public void generateOtp(@PathVariable Long courseId, @PathVariable Long lessonId) {
+        courseService.generateOtpForLesson(courseId, lessonId);
+    }
+
 }
+
+
+
