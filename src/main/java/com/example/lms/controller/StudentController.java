@@ -2,10 +2,12 @@ package com.example.lms.controller;
 
 import com.example.lms.config.JwtService;
 import com.example.lms.model.Course;
+import com.example.lms.model.Grades;
 import com.example.lms.model.Lesson;
 import com.example.lms.model.User;
 import com.example.lms.service.CourseService;
 import com.example.lms.model.Submission;
+import com.example.lms.service.GradesService;
 import com.example.lms.service.SubmissionService;
 import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
@@ -28,6 +30,21 @@ public class StudentController {
     @Autowired
     private UserServiceImp userServiceImp;
 
+    @Autowired
+    private GradesService gradesService;
+
+    //Grading related endpoint
+    @GetMapping("/allGrades/{studentId}")
+    @RolesAllowed({"STUDENT"})
+    public List<Grades> getStudentGrades(@PathVariable Long studentId){
+        return gradesService.viewStudentGrades(studentId);
+    }
+
+    @GetMapping("/quizGrade")
+    @RolesAllowed({"STUDENT"})
+    public Grades getQuizGrade(@RequestParam Long studentId, @RequestParam Long quizId){
+        return gradesService.getQuizGrade(studentId, quizId);
+    }
 
     @PostMapping("/submission/submit")
     @RolesAllowed({"STUDENT"})

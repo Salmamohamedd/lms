@@ -17,6 +17,15 @@ public class Submission {
     private String filePath;   // For assignments
     private Double score;      // For quiz or assignment
     private String feedback;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public Long getSubmissionId() {
         return submissionId;

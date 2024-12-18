@@ -1,7 +1,9 @@
 package com.example.lms.controller;
 
 
+
 import com.example.lms.config.JwtService;
+
 import com.example.lms.model.*;
 import com.example.lms.service.*;
 import jakarta.annotation.security.RolesAllowed;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PublicKey;
 import java.util.List;
 
 import com.example.lms.service.CourseService;
@@ -29,6 +32,18 @@ public class InstructorController {
     @Autowired
     private UserServiceImp userServiceImp;
 
+    @Autowired
+    private GradesService gradesService;
+
+    //Grading related endpoints
+    @PostMapping("/gardeAss")
+    @RolesAllowed({"INSTRUCTOR"})
+    public Submission gradeAssignment(@RequestBody Submission submission){
+        return gradesService.gradeAssignment(submission.getSubmissionId(), submission.getScore(), submission.getFeedback());
+    }
+
+    /////////////////////////
+    //Assessments related endpoints
     @PostMapping("/assessments/create")
     @RolesAllowed({"INSTRUCTOR"})
     public Assessment createAssessment(@RequestBody Assessment assessment) {
@@ -69,6 +84,11 @@ public class InstructorController {
     @RolesAllowed({"INSTRUCTOR"})
     public Question updateQuestion(@PathVariable Long questionId, @RequestBody Question updatedQuestion) {
         return questionService.updateQuestion(questionId, updatedQuestion);
+    }
+    @DeleteMapping("/questions/delete/{questionId}")
+    @RolesAllowed({"INSTRUCTOR"})
+    public void deleteQuestion(@PathVariable Long questionId) {
+        questionService.deleteQuestion(questionId);
     }
 
     ///////////////

@@ -12,9 +12,15 @@ public class SubmissionService {
 
     @Autowired
     private SubmissionRepository submissionRepository;
+    @Autowired
+    private GradesService gradesService;
 
     // Submit a new submission
     public Submission submit(Submission submission) {
+        if (submission.getType().equalsIgnoreCase("quiz")){
+            Submission gradedQuiz = gradesService.autoGradeQuiz(submission.getSubmissionId());
+            return submissionRepository.save(gradedQuiz);
+        }
         return submissionRepository.save(submission);
     }
 
