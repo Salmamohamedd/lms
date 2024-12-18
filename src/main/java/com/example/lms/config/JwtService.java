@@ -65,15 +65,11 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-//    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-//        return Jwts.builder()
-//                .setClaims(extraClaims)
-//                .setSubject(userDetails.getUsername())
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-//                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
+    public String extractClaim(String token, String claimName) {
+        Claims claims = extractAllClaims(token);
+        return claims.get(claimName, String.class);
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .setClaims(extraClaims)

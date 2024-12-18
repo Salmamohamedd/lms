@@ -1,45 +1,89 @@
+
+
 package com.example.lms.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.lms.model.Course;
+import com.example.lms.model.Lesson;
+import com.example.lms.repository.CourseRepository;
+import com.example.lms.repository.LessonRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.function.Function;
+import java.util.List;
+import java.util.UUID;
 
+@Service
 public class CourseService {
-    @Service
-    public static class JWTServiceImp {
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    // Get all courses
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    // Get course by ID
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+    }
+
+    // Create a new course (Instructor only)
+    public Course createCourse(Course course) {
+        return courseRepository.save(course);
+    }
+
+    // Delete a course (Admin only)
+    public void deleteCourse(Long id) {
+        courseRepository.deleteById(id);  // Delete the course by ID
+    }
+
+    // Enroll a student in a course (Student only)
+    public void enrollStudent(Long courseId, String studentName) {
+        Course course = getCourseById(courseId);
+        course.getEnrolledStudents().add(studentName);
+    }
+
+    public Lesson addLessonToCourse(Long courseId, Lesson lesson) {
+        Course course = getCourseById(courseId);
+        return lessonRepository.save(lesson, course);
+    }
+
+    // Delete a lesson from a course (Instructor only)
+    public void deleteLessonFromCourse(Long courseId, Long lessonId) {
+        Course course = getCourseById(courseId);
+        lessonRepository.deleteById(lessonId, course);
+    }
+
+    // Get all lessons for a course (Admin, Instructor, Student)
+    public List<Lesson> getLessonsForCourse(Long courseId) {
+        Course course = getCourseById(courseId);
+        return lessonRepository.findByCourse(course);
+    }
+
+    // Get enrolled students for a course (Admin, Instructor)
+    public List<String> getEnrolledStudents(Long courseId) {
+        return getCourseById(courseId).getEnrolledStudents();
+    }
+
+    public void generateOtpForLesson(Long courseId, Long lessonId) {
+        Course course = getCourseById(courseId);
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+        lesson.setOtp(generateRandomOtp());  // Use a method to generate a random OTP
+    }
+
+    private String generateRandomOtp() {
+        return UUID.randomUUID().toString().substring(0, 6);  // Generate a 6-character OTP
+    }
 
 
-        private String generateToken(UserDetails userDetails) {
-            return Jwts.builder().setSubject(userDetails.getUsername())
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                    .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                    .compact();
-        }
-
-        public String extractUserName(String token){
-            return extractClaim(token, Claims::getSubject);
-        }
-
-        private <T> T extractClaim(String token, Function<Claims, T> claimsTFunction){
-            final Claims claims = extractAllClaims(token);
-            return claimsTFunction.apply(claims);
-        }
-        private Key getSignKey(){
-            byte[] key = Decoders.BASE64.decode("413F4428472B4B6250655368566D5970337336763979244226452948404D6351");
-            return Keys.hmacShaKeyFor(key);
-        }
-
-        private Claims extractAllClaims(String token){
-            return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
-        }
+    public boolean verifyOtp(Long courseId, Long lessonId, String otp) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+        return lesson.getOtp().equals(otp);
     }
 }
+
