@@ -36,7 +36,7 @@ public class InstructorController {
     private GradesService gradesService;
 
     //Grading related endpoints
-    @PostMapping("/gardeAss")
+    @PostMapping("/gradeAss")
     @RolesAllowed({"INSTRUCTOR"})
     public Submission gradeAssignment(@RequestBody Submission submission){
         return gradesService.gradeAssignment(submission.getSubmissionId(), submission.getScore(), submission.getFeedback());

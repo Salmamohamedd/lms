@@ -17,11 +17,12 @@ public class SubmissionService {
 
     // Submit a new submission
     public Submission submit(Submission submission) {
-        if (submission.getType().equalsIgnoreCase("quiz")){
-            Submission gradedQuiz = gradesService.autoGradeQuiz(submission.getSubmissionId());
-            return submissionRepository.save(gradedQuiz);
+        Submission savedSubmission = submissionRepository.save(submission);
+        if (savedSubmission.getType().equalsIgnoreCase("quiz")){
+            Submission gradedQuiz = gradesService.autoGradeQuiz(savedSubmission.getSubmissionId());
+            return gradedQuiz;
         }
-        return submissionRepository.save(submission);
+        return savedSubmission;
     }
 
     // Get a submission by ID
