@@ -33,59 +33,6 @@ public class Course {
         this.courseId = id;
     }
 
-    // Getter and Setter for title
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    // Getter and Setter for description
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    // Getter and Setter for duration
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    // Getter and Setter for mediaFiles
-    public List<String> getMediaFiles() {
-        return mediaFiles;
-    }
-
-    public void setMediaFiles(List<String> mediaFiles) {
-        this.mediaFiles = mediaFiles;
-    }
-
-    // Getter and Setter for lessons
-    public List<Lesson> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
-    }
-
-    // Getter and Setter for enrolledStudents
-    public List<String> getEnrolledStudents() {
-        return enrolledStudents;
-    }
-
-    public void setEnrolledStudents(List<String> enrolledStudents) {
-        this.enrolledStudents = enrolledStudents;
-    }
 }
 
 
