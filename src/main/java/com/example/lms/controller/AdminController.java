@@ -7,20 +7,14 @@ import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
 import com.example.lms.service.CourseService;
 import java.util.List;
-import com.example.lms.repository.UserRepository;
-import com.example.lms.service.AdminService;
 import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admins")
@@ -33,8 +27,7 @@ public class AdminController {
     @Autowired
     private CourseService courseService;
 
-    // Example: Create a user by verifying the role through ID
-
+    // user management endpoints
     @PostMapping("/createUser")
     @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> createUser(@RequestBody User user) {
@@ -54,7 +47,7 @@ public class AdminController {
     public ResponseEntity<?> getById(@RequestHeader("Authorization") String authorizationHeader) {
         // Extract the user ID from the token
         String token = authorizationHeader.substring(7); // Remove "Bearer "
-        String email = jwtService.extractClaim(token, "sub"); // Assuming the token contains an "id" claim
+        String email = jwtService.extractClaim(token, "sub"); // "sub" claim in token contains the email
 
         // Fetch the user by ID (if needed)
         User admin = userServiceImp.getUserByEmail(email);
@@ -78,7 +71,7 @@ public class AdminController {
     public ResponseEntity<?> updateById(@RequestHeader("Authorization") String authorizationHeader,
                                         @RequestBody User user){
         String token = authorizationHeader.substring(7); // Remove "Bearer "
-        String email = jwtService.extractClaim(token, "sub"); // Assuming the token contains an "id" claim
+        String email = jwtService.extractClaim(token, "sub"); // "sub" claim in token contains the email
 
         // Fetch the user by ID (if needed)
         User admin = userServiceImp.getUserByEmail(email);

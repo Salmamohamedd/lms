@@ -1,12 +1,16 @@
 package com.example.lms.controller;
 
+import com.example.lms.config.JwtService;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
+import com.example.lms.model.User;
 import com.example.lms.service.CourseService;
 import com.example.lms.model.Submission;
 import com.example.lms.service.SubmissionService;
+import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -19,6 +23,10 @@ public class StudentController {
 
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private UserServiceImp userServiceImp;
 
 
     @PostMapping("/submission/submit")
@@ -67,6 +75,34 @@ public class StudentController {
         return courseService.verifyOtp(courseId, lessonId, otp);
     }
 
+    // profile-related endpoints
+    @GetMapping("/viewStudentProfile")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<?> getById(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the user ID from the token
+        String token = authorizationHeader.substring(7); // Remove "Bearer "
+        String email = jwtService.extractClaim(token, "sub"); // "sub" claim in token contains the email
+
+        // Fetch the user by ID (if needed)
+        User student = userServiceImp.getUserByEmail(email);
+
+        // Return the user with HTTP status 200 OK
+        return ResponseEntity.ok(student);
+    }
+
+    @PutMapping("/updateStudentProfile")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<?> updateById(@RequestHeader("Authorization") String authorizationHeader,
+                                        @RequestBody User user){
+        String token = authorizationHeader.substring(7);
+        String email = jwtService.extractClaim(token, "sub");
+
+        // Fetch the user by ID (if needed)
+        User student = userServiceImp.getUserByEmail(email);
+        userServiceImp.updateById(student.getId(), user);
+        user.setId(student.getId());
+        return ResponseEntity.ok(user);
+    }
 
 
 

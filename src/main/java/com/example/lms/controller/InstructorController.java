@@ -1,18 +1,16 @@
 package com.example.lms.controller;
 
 
-import com.example.lms.model.Assessment;
-import com.example.lms.model.Question;
-import com.example.lms.service.AssessmentService;
-import com.example.lms.service.CourseService;
-import com.example.lms.service.QuestionService;
+import com.example.lms.config.JwtService;
+import com.example.lms.model.*;
+import com.example.lms.service.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import com.example.lms.model.Lesson;
-import com.example.lms.model.Course;
+
 import com.example.lms.service.CourseService;
 @RestController
 @RequestMapping("/api/instructors")
@@ -26,6 +24,10 @@ public class InstructorController {
 
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private UserServiceImp userServiceImp;
 
     @PostMapping("/assessments/create")
     @RolesAllowed({"INSTRUCTOR"})
@@ -100,6 +102,35 @@ public class InstructorController {
     @RolesAllowed({"INSTRUCTOR"})
     public void generateOtp(@PathVariable Long courseId, @PathVariable Long lessonId) {
         courseService.generateOtpForLesson(courseId, lessonId);
+    }
+
+    // profile-related endpoints
+    @GetMapping("/viewInstructorProfile")
+    @RolesAllowed({"INSTRUCTOR"})
+    public ResponseEntity<?> getById(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the user ID from the token
+        String token = authorizationHeader.substring(7); // Remove "Bearer "
+        String email = jwtService.extractClaim(token, "sub"); // "sub" claim in token contains the email
+
+        // Fetch the user by ID (if needed)
+        User instructor = userServiceImp.getUserByEmail(email);
+
+        // Return the user with HTTP status 200 OK
+        return ResponseEntity.ok(instructor);
+    }
+
+    @PutMapping("/updateInstructorProfile")
+    @RolesAllowed({"INSTRUCTOR"})
+    public ResponseEntity<?> updateById(@RequestHeader("Authorization") String authorizationHeader,
+                                        @RequestBody User user){
+        String token = authorizationHeader.substring(7);
+        String email = jwtService.extractClaim(token, "sub");
+
+        // Fetch the user by ID (if needed)
+        User instructor = userServiceImp.getUserByEmail(email);
+        userServiceImp.updateById(instructor.getId(), user);
+        user.setId(instructor.getId());
+        return ResponseEntity.ok(user);
     }
 
 }
