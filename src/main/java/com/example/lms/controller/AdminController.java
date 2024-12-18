@@ -30,7 +30,6 @@ public class AdminController {
 
     @PostMapping("/createUser")
     @RolesAllowed({"ADMIN"})
-
     public ResponseEntity<?> createUser(@RequestBody User user) {
 
         User newUser = userServiceImp.createUser(user);

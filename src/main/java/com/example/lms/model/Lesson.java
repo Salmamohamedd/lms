@@ -12,6 +12,9 @@ public class Lesson {
     private String title;
     private String content;
     private String otp; // For attendance
+    @ManyToOne
+    @JoinColumn(name = "courseId", nullable = false)
+    private Course course;
 
     // Constructor
     public Lesson(Long id, String title, String content) {

@@ -18,7 +18,7 @@ public class Course {
     private String duration;
     @ElementCollection
     private List<String> mediaFiles = new ArrayList<>();
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
     @ElementCollection
     private List<String> enrolledStudents = new ArrayList<>();
