@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long courseId;
     private String title;
     private String description;
     private String duration;
@@ -26,11 +26,11 @@ public class Course {
 
     // Getter and Setter for id
     public Long getId() {
-        return id;
+        return courseId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.courseId = id;
     }
 
     // Getter and Setter for title
