@@ -1,7 +1,12 @@
+
 package com.example.lms.controller;
 
 import com.example.lms.config.JwtService;
 import com.example.lms.model.User;
+import com.example.lms.model.Course;
+import com.example.lms.model.Lesson;
+import com.example.lms.service.CourseService;
+import java.util.List;
 import com.example.lms.repository.UserRepository;
 import com.example.lms.service.AdminService;
 import com.example.lms.service.UserServiceImp;
@@ -25,6 +30,8 @@ public class AdminController {
     private UserServiceImp userServiceImp;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private CourseService courseService;
 
     // Example: Create a user by verifying the role through ID
 
@@ -84,7 +91,7 @@ public class AdminController {
     @PutMapping("/updateProfile/{id}")
     @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> updateUserById(@PathVariable int id,
-                                        @RequestBody User user){
+                                            @RequestBody User user){
 
         userServiceImp.updateById(id, user);
         user.setId(id);
@@ -101,6 +108,37 @@ public class AdminController {
 
     }
 
+    // New Course-Related Endpoints
+
+    @GetMapping("/getCourses")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<List<Course>> getAllCourses() {
+        List<Course> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(courses);
+    }
+
+    @DeleteMapping("/deleteCourses/{id}")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        return ResponseEntity.ok("Course deleted successfully");
+    }
+
+    @GetMapping("/courseEnrolled/{id}/students")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<List<String>> getEnrolledStudents(@PathVariable Long id) {
+        List<String> students = courseService.getEnrolledStudents(id);
+        return ResponseEntity.ok(students);
+    }
+
+    @GetMapping("/getLessons/{id}/lessons")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<List<Lesson>> getLessons(@PathVariable Long id) {
+        List<Lesson> lessons = courseService.getLessonsForCourse(id);
+        return ResponseEntity.ok(lessons);
+    }
 
 
 }
+
+
