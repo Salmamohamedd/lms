@@ -6,11 +6,17 @@ import com.example.lms.model.User;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
 import com.example.lms.service.CourseService;
+
+import java.io.IOException;
 import java.util.List;
+
+import com.example.lms.service.PerformanceReportService;
 import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -26,7 +32,22 @@ public class AdminController {
     private JwtService jwtService;
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private PerformanceReportService performanceReportService;
 
+    //performance analytics related endpoint
+    @GetMapping("/report")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<byte[]> generateReport(@RequestParam Long courseId) throws IOException, IOException {
+        byte[] report = performanceReportService.generatePerformanceReport(courseId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=performance_report.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(report);
+    }
+
+    ///////////////////////////
     // user management endpoints
     @PostMapping("/createUser")
     @RolesAllowed({"ADMIN"})
@@ -39,7 +60,6 @@ public class AdminController {
         response.put("user", user);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
 
 
     @GetMapping("/viewAdminProfile")

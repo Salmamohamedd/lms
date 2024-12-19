@@ -9,9 +9,12 @@ import com.example.lms.model.*;
 import com.example.lms.service.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.PublicKey;
 import java.util.List;
 
@@ -36,6 +39,8 @@ public class InstructorController {
     private GradesService gradesService;
     @Autowired
     private ProgressService progressService;
+    @Autowired
+    private PerformanceReportService performanceReportService;
 
     //Grading related endpoints
     @PostMapping("/gradeAss")
@@ -49,6 +54,18 @@ public class InstructorController {
     @RolesAllowed({"INSTRUCTOR"})
     public StudentProgress getStudentProgress(@RequestParam Long studentId, @RequestParam Long courseId){
         return progressService.getStudentProgress(studentId, courseId);
+    }
+    //////////////////////////
+    //performance analytics related endpoint
+    @GetMapping("/report")
+    @RolesAllowed({"INSTRUCTOR"})
+    public ResponseEntity<byte[]> generateReport(@RequestParam Long courseId) throws IOException, IOException {
+        byte[] report = performanceReportService.generatePerformanceReport(courseId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=performance_report.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(report);
     }
 
     /////////////////////////
