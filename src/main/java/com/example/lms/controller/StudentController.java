@@ -36,6 +36,11 @@ public class StudentController {
     public List<Grades> getStudentGrades(@PathVariable Long studentId){
         return gradesService.viewStudentGrades(studentId);
     }
+    @GetMapping("/allGrades")
+    @RolesAllowed({"STUDENT"})
+    public List<Grades> getStudentCourseGrades(@RequestParam Long studentId, @RequestParam Long courseId){
+        return gradesService.viewStudentCourseGrades(studentId, courseId);
+    }
 
     @GetMapping("/quizGrade")
     @RolesAllowed({"STUDENT"})
@@ -47,6 +52,8 @@ public class StudentController {
     public List<StudentAnswers> getStudentAnswers(@RequestParam Long studentId, @RequestParam Long submissionId){
         return gradesService.getstudentAnswers(studentId, submissionId);
     }
+    ///////////////////
+    //Assessment related endpoints
     @PostMapping("/submission/submit-assignment")
     @RolesAllowed({"STUDENT"})
     public Submission submitAssignment(@RequestBody Submission submission) {
@@ -72,6 +79,7 @@ public class StudentController {
     }
 
 
+    /////////////////////////////////
     // New course-related endpoints
 
     @GetMapping("/getCourses")
@@ -98,6 +106,7 @@ public class StudentController {
         return courseService.verifyOtp(courseId, lessonId, otp);
     }
 
+    ////////////////////////////////
     // profile-related endpoints
     @GetMapping("/viewStudentProfile")
     @RolesAllowed({"STUDENT"})

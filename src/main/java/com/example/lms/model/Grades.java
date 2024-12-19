@@ -21,31 +21,24 @@ public class Grades {
     private Long assessmentId;
     private Double score;
     private String feedback;
+    private Long courseId;
 
     public Grades(){}
-    public Grades(Long studentId, Long assessmentId, Double score, String feedback) {
+    public Grades(Long studentId, Long assessmentId, Double score, String feedback, Long courseId) {
         this.studentId = studentId;
         this.assessmentId = assessmentId;
         this.score = score;
         this.feedback = feedback;
+        this.courseId = courseId;
     }
 
-    public Grades(Long gradeId, Long studentId, Long assessmentId, Double score, String feedback) {
+    public Grades(Long gradeId, Long studentId, Long assessmentId, Double score, String feedback, Long courseId) {
         this.gradeId = gradeId;
         this.studentId = studentId;
         this.assessmentId = assessmentId;
         this.score = score;
         this.feedback = feedback;
+        this.courseId = courseId;
     }
 
-    @Override
-    public String toString() {
-        return "Grades{" +
-                "gradeId=" + gradeId +
-                ", studentId=" + studentId +
-                ", assessmentId=" + assessmentId +
-                ", score=" + score +
-                ", feedback='" + feedback + '\'' +
-                '}';
-    }
 }

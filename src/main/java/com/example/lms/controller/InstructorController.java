@@ -2,6 +2,7 @@ package com.example.lms.controller;
 
 
 
+import com.example.lms.DTO.StudentProgress;
 import com.example.lms.config.JwtService;
 
 import com.example.lms.model.*;
@@ -31,15 +32,23 @@ public class InstructorController {
     private JwtService jwtService;
     @Autowired
     private UserServiceImp userServiceImp;
-
     @Autowired
     private GradesService gradesService;
+    @Autowired
+    private ProgressService progressService;
 
     //Grading related endpoints
     @PostMapping("/gradeAss")
     @RolesAllowed({"INSTRUCTOR"})
     public Submission gradeAssignment(@RequestBody Submission submission){
         return gradesService.gradeAssignment(submission.getSubmissionId(), submission.getScore(), submission.getFeedback());
+    }
+    ////////////////////////////
+    //Performance tracking related endpoints
+    @GetMapping("/student-progress")
+    @RolesAllowed({"INSTRUCTOR"})
+    public StudentProgress getStudentProgress(@RequestParam Long studentId, @RequestParam Long courseId){
+        return progressService.getStudentProgress(studentId, courseId);
     }
 
     /////////////////////////
@@ -124,6 +133,7 @@ public class InstructorController {
         courseService.generateOtpForLesson(courseId, lessonId);
     }
 
+    /////////////////////////////
     // profile-related endpoints
     @GetMapping("/viewInstructorProfile")
     @RolesAllowed({"INSTRUCTOR"})

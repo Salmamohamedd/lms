@@ -48,4 +48,11 @@ public class AssessmentRepository {
         }
         return courseAssessments;
     }
+    // Find the type of assessment by its ID
+    public Optional<AssessmentType> findTypeByAssessmentId(Long assessmentId) {
+        return assessments.stream()
+                .filter(assessment -> assessment.getAssessmentId().equals(assessmentId))
+                .map(Assessment::getType)
+                .findFirst();
+    }
 }

@@ -3,15 +3,13 @@ package com.example.lms.service;
 import com.example.lms.DTO.QuizSubmissionRequest;
 import com.example.lms.DTO.StudentAnswersRequest;
 import com.example.lms.model.*;
-import com.example.lms.repository.GradesRepository;
-import com.example.lms.repository.QuestionRepository;
-import com.example.lms.repository.StudentAnswersRepository;
-import com.example.lms.repository.SubmissionRepository;
+import com.example.lms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +22,8 @@ public class GradesService {
     private StudentAnswersRepository studentAnswersRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private AssessmentRepository assessmentRepository;
 
     //function for manual assessment grading
     public Submission gradeAssignment(Long submissionId, Double score, String feedback){
@@ -34,8 +34,9 @@ public class GradesService {
         }
         submission.setScore(score);
         submission.setFeedback(feedback);
-
-        Grades grade = new Grades(submission.getStudentId(), submission.getAssessmentId(), score, feedback);
+        Optional<Assessment> assessment = assessmentRepository.findById(submission.getAssessmentId());
+        Long courseId = assessment.get().getCourseId();
+        Grades grade = new Grades(submission.getStudentId(), submission.getAssessmentId(), score, feedback, courseId);
         gradesRepository.save(grade);
         return submissionRepository.save(submission);
     }
@@ -87,7 +88,9 @@ public class GradesService {
             feedback = "Needs improvement";
         }
         submission.setFeedback(feedback);
-        Grades grade = new Grades(submission.getStudentId(), submission.getAssessmentId(), score, feedback);
+        Optional<Assessment> assessment = assessmentRepository.findById(submission.getAssessmentId());
+        Long courseId = assessment.get().getCourseId();
+        Grades grade = new Grades(submission.getStudentId(), submission.getAssessmentId(), score, feedback, courseId);
         gradesRepository.save(grade);
         return submissionRepository.save(submission);
     }
@@ -126,5 +129,13 @@ public class GradesService {
             throw new IllegalStateException("No answers for student with id " + studentId);
         }
         return studentAnswersList;
+    }
+
+    public List<Grades> viewStudentCourseGrades(Long studentId, Long courseId) {
+        List<Grades> gradesList = gradesRepository.findGradesByStudentIdAndCourseId(studentId, courseId);
+        if (gradesList == null || gradesList.isEmpty()){
+            throw new IllegalStateException("No grades for student with id " + studentId);
+        }
+        return gradesList;
     }
 }
