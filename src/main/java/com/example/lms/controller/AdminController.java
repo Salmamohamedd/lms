@@ -5,6 +5,7 @@ import com.example.lms.config.JwtService;
 import com.example.lms.model.User;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
+import com.example.lms.service.ChartService;
 import com.example.lms.service.CourseService;
 
 import java.io.IOException;
@@ -34,6 +35,8 @@ public class AdminController {
     private CourseService courseService;
     @Autowired
     private PerformanceReportService performanceReportService;
+    @Autowired
+    private ChartService chartService;
 
     //performance analytics related endpoint
     @GetMapping("/report")
@@ -45,6 +48,16 @@ public class AdminController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=performance_report.xlsx")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(report);
+    }
+    @GetMapping("/chart")
+    @RolesAllowed({"ADMIN"})
+    public ResponseEntity<byte[]> getPerformanceChart(@RequestParam Long courseId) throws IOException {
+        byte[] chart = chartService.generatePerformanceChart(courseId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=performance_chart.png")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(chart);
     }
 
     ///////////////////////////

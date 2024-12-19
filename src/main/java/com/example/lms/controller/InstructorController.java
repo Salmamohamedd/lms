@@ -41,6 +41,8 @@ public class InstructorController {
     private ProgressService progressService;
     @Autowired
     private PerformanceReportService performanceReportService;
+    @Autowired
+    private ChartService chartService;
 
     //Grading related endpoints
     @PostMapping("/gradeAss")
@@ -66,6 +68,16 @@ public class InstructorController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=performance_report.xlsx")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(report);
+    }
+    @GetMapping("/chart")
+    @RolesAllowed({"INSTRUCTOR"})
+    public ResponseEntity<byte[]> getPerformanceChart(@RequestParam Long courseId) throws IOException {
+        byte[] chart = chartService.generatePerformanceChart(courseId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=performance_chart.png")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(chart);
     }
 
     /////////////////////////
