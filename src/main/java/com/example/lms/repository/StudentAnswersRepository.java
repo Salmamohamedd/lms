@@ -10,4 +10,6 @@ import java.util.List;
 public interface StudentAnswersRepository extends JpaRepository<StudentAnswers, Long> {
 
     List<StudentAnswers> findStudentAnswersBySubmissionId(Long submissionId);
+
+    List<StudentAnswers> findStudentAnswersByStudentIdAndSubmissionId(Long studentId, Long submissionId);
 }

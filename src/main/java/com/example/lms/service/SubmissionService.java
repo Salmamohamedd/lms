@@ -1,5 +1,6 @@
 package com.example.lms.service;
 
+import com.example.lms.DTO.QuizSubmissionRequest;
 import com.example.lms.model.Submission;
 import com.example.lms.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,11 @@ public class SubmissionService {
     private GradesService gradesService;
 
     // Submit a new submission
-    public Submission submit(Submission submission) {
-        Submission savedSubmission = submissionRepository.save(submission);
-        if (savedSubmission.getType().equalsIgnoreCase("quiz")){
-            Submission gradedQuiz = gradesService.autoGradeQuiz(savedSubmission.getSubmissionId());
-            return gradedQuiz;
+    public Submission submitAssignment(Submission submission) {
+        if (!submission.getType().equalsIgnoreCase("assignment")){
+            throw new IllegalStateException("This submission is not an assignment.");
         }
-        return savedSubmission;
+        return submissionRepository.save(submission);
     }
 
     // Get a submission by ID
@@ -35,5 +34,10 @@ public class SubmissionService {
     // Delete a submission by ID
     public void deleteSubmission(Long submissionId) {
         submissionRepository.deleteById(submissionId);
+    }
+
+    public Submission submitQuiz(QuizSubmissionRequest quizSubmissionRequest) {
+        Submission submission = gradesService.saveQuizSubmission(quizSubmissionRequest);
+        return gradesService.autoGradeQuiz(submission.getSubmissionId());
     }
 }

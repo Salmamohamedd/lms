@@ -1,12 +1,9 @@
 package com.example.lms.controller;
 
+import com.example.lms.DTO.QuizSubmissionRequest;
 import com.example.lms.config.JwtService;
-import com.example.lms.model.Course;
-import com.example.lms.model.Grades;
-import com.example.lms.model.Lesson;
-import com.example.lms.model.User;
+import com.example.lms.model.*;
 import com.example.lms.service.CourseService;
-import com.example.lms.model.Submission;
 import com.example.lms.service.GradesService;
 import com.example.lms.service.SubmissionService;
 import com.example.lms.service.UserServiceImp;
@@ -45,13 +42,22 @@ public class StudentController {
     public Grades getQuizGrade(@RequestParam Long studentId, @RequestParam Long quizId){
         return gradesService.getQuizGrade(studentId, quizId);
     }
-
-    @PostMapping("/submission/submit")
+    @GetMapping("/answers")
     @RolesAllowed({"STUDENT"})
-    public Submission submit(@RequestBody Submission submission) {
-        return submissionService.submit(submission);
+    public List<StudentAnswers> getStudentAnswers(@RequestParam Long studentId, @RequestParam Long submissionId){
+        return gradesService.getstudentAnswers(studentId, submissionId);
+    }
+    @PostMapping("/submission/submit-assignment")
+    @RolesAllowed({"STUDENT"})
+    public Submission submitAssignment(@RequestBody Submission submission) {
+        return submissionService.submitAssignment(submission);
     }
 
+    @PostMapping("/submission/submit-quiz")
+    @RolesAllowed({"STUDENT"})
+    public Submission submitQuiz(@RequestBody QuizSubmissionRequest quizSubmissionRequest){
+        return submissionService.submitQuiz(quizSubmissionRequest);
+    }
 
     @GetMapping("/submission/{submissionId}")
     @RolesAllowed({"STUDENT"})

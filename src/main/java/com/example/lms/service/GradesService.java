@@ -1,5 +1,7 @@
 package com.example.lms.service;
 
+import com.example.lms.DTO.QuizSubmissionRequest;
+import com.example.lms.DTO.StudentAnswersRequest;
 import com.example.lms.model.*;
 import com.example.lms.repository.GradesRepository;
 import com.example.lms.repository.QuestionRepository;
@@ -93,9 +95,36 @@ public class GradesService {
     public Grades getQuizGrade(Long studentId, Long quizId){
         Grades quizGrade = gradesRepository.findGradeByStudentIdAndAssessmentId(studentId, quizId);
         if (quizGrade == null){
-            throw new IllegalStateException("No rade found for student with id " + studentId + " for quiz with id " + quizId);
+            throw new IllegalStateException("No grade found for student with id " + studentId + " for quiz with id " + quizId);
         }
         return quizGrade;
+    }
 
+    public Submission saveQuizSubmission(QuizSubmissionRequest quizSubmissionRequest){
+        //save the submission
+        Submission submission = new Submission();
+        submission.setAssessmentId(quizSubmissionRequest.getQuizId());
+        submission.setStudentId(quizSubmissionRequest.getStudentId());
+        submission.setType("quiz");
+        submissionRepository.save(submission);
+
+        //save student answers
+        for (StudentAnswersRequest answersRequest:quizSubmissionRequest.getStudentAnswers()){
+            StudentAnswers studentAnswer = new StudentAnswers();
+            studentAnswer.setSubmissionId(submission.getSubmissionId());
+            studentAnswer.setStudentId(quizSubmissionRequest.getStudentId());
+            studentAnswer.setQuestionId(answersRequest.getQuestionId());
+            studentAnswer.setGivenAnswer(answersRequest.getAnswer());
+            studentAnswersRepository.save(studentAnswer);
+        }
+        return submission;
+    }
+
+    public List<StudentAnswers> getstudentAnswers(Long studentId, Long submissionId){
+        List<StudentAnswers> studentAnswersList = studentAnswersRepository.findStudentAnswersByStudentIdAndSubmissionId(studentId, submissionId);
+        if (studentAnswersList == null || studentAnswersList.isEmpty()){
+            throw new IllegalStateException("No answers for student with id " + studentId);
+        }
+        return studentAnswersList;
     }
 }
