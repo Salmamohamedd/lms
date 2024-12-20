@@ -35,4 +35,8 @@ public class SubmissionRepository {
     public void deleteById(Long id) {
         submissions.removeIf(submission -> submission.getSubmissionId().equals(id));
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

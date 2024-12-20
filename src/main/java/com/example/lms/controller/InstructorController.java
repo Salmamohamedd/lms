@@ -1,6 +1,7 @@
 package com.example.lms.controller;
 
 
+<<<<<<< Updated upstream
 
 import com.example.lms.DTO.StudentProgress;
 import com.example.lms.config.JwtService;
@@ -18,6 +19,20 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.util.List;
 
+=======
+import com.example.lms.model.Assessment;
+import com.example.lms.model.Question;
+import com.example.lms.service.AssessmentService;
+import com.example.lms.service.CourseService;
+import com.example.lms.service.QuestionService;
+import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import com.example.lms.model.Lesson;
+import com.example.lms.model.Course;
+>>>>>>> Stashed changes
 import com.example.lms.service.CourseService;
 @RestController
 @RequestMapping("/api/instructors")
@@ -31,6 +46,7 @@ public class InstructorController {
 
     @Autowired
     private CourseService courseService;
+<<<<<<< Updated upstream
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -82,6 +98,9 @@ public class InstructorController {
 
     /////////////////////////
     //Assessments related endpoints
+=======
+
+>>>>>>> Stashed changes
     @PostMapping("/assessments/create")
     @RolesAllowed({"INSTRUCTOR"})
     public Assessment createAssessment(@RequestBody Assessment assessment) {
@@ -123,11 +142,14 @@ public class InstructorController {
     public Question updateQuestion(@PathVariable Long questionId, @RequestBody Question updatedQuestion) {
         return questionService.updateQuestion(questionId, updatedQuestion);
     }
+<<<<<<< Updated upstream
     @DeleteMapping("/questions/delete/{questionId}")
     @RolesAllowed({"INSTRUCTOR"})
     public void deleteQuestion(@PathVariable Long questionId) {
         questionService.deleteQuestion(questionId);
     }
+=======
+>>>>>>> Stashed changes
 
     ///////////////
 
@@ -162,6 +184,7 @@ public class InstructorController {
         courseService.generateOtpForLesson(courseId, lessonId);
     }
 
+<<<<<<< Updated upstream
     /////////////////////////////
     // profile-related endpoints
     @GetMapping("/viewInstructorProfile")
@@ -192,6 +215,8 @@ public class InstructorController {
         return ResponseEntity.ok(user);
     }
 
+=======
+>>>>>>> Stashed changes
 }
 
 

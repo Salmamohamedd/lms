@@ -59,4 +59,8 @@ public class Assessment {
         this.assessmentId = assessmentId;
     }
 
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

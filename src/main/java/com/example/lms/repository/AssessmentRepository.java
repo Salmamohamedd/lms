@@ -48,6 +48,7 @@ public class AssessmentRepository {
         }
         return courseAssessments;
     }
+<<<<<<< Updated upstream
     // Find the type of assessment by its ID
     public Optional<AssessmentType> findTypeByAssessmentId(Long assessmentId) {
         return assessments.stream()
@@ -56,3 +57,6 @@ public class AssessmentRepository {
                 .findFirst();
     }
 }
+=======
+}
+>>>>>>> Stashed changes

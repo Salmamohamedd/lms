@@ -46,4 +46,8 @@ public class AssessmentService {
     public List<Assessment> getAssessmentsByCourse(Long courseId) {
         return assessmentRepository.findByCourseId(courseId);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
