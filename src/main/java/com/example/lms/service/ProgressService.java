@@ -2,10 +2,8 @@ package com.example.lms.service;
 
 import com.example.lms.DTO.StudentProgress;
 import com.example.lms.model.AssessmentType;
-import com.example.lms.model.Attendance;
 import com.example.lms.model.Grades;
 import com.example.lms.repository.AssessmentRepository;
-import com.example.lms.repository.AttendanceRepository;
 import com.example.lms.repository.GradesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,14 +11,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProgressService {
     @Autowired
     private GradesRepository gradesRepository;
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private AttendanceService attendanceService;
     @Autowired
     private AssessmentRepository assessmentRepository;
 
@@ -52,11 +49,8 @@ public class ProgressService {
         Double averageAssignmentScore = assignmentGrades.stream().mapToDouble(Grades::getScore).average().orElse(0.0);
 
         // Fetch attendance
-//        Attendance attendance = attendanceRepository.findAttendanceByStudentIdAndCourseId(studentId, courseId)
-//                .orElseThrow(() -> new IllegalStateException("Attendance data not found for student ID " + studentId + " and course ID " + courseId));
-//        //get attendance percentage
-//        Double attendancePercentage = (double)attendance.getLessonsAttended() / attendance.getTotalLessons() * 100;
+        Double attendancePercentage = attendanceService.getAttendancePercentage(studentId, courseId);
 
-        return new StudentProgress(totalQuizzes, totalAssignments, averageQuizScore, averageAssignmentScore);
+        return new StudentProgress(totalQuizzes, totalAssignments, averageQuizScore, averageAssignmentScore, attendancePercentage);
     }
 }

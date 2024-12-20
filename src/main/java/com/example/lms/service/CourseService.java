@@ -19,6 +19,8 @@ public class CourseService {
     private CourseRepository courseRepository;
     @Autowired
     private LessonRepository lessonRepository;
+    @Autowired
+    private AttendanceService attendanceService;
 
     // Get all courses
     public List<Course> getAllCourses() {
@@ -44,6 +46,7 @@ public class CourseService {
     public void enrollStudent(Long courseId, String studentName) {
         Course course = getCourseById(courseId);
         course.getEnrolledStudents().add(studentName);
+
     }
 
     public Lesson addLessonToCourse(Long courseId, Lesson lesson) {
@@ -80,10 +83,14 @@ public class CourseService {
     }
 
 
-    public boolean verifyOtp(Long courseId, Long lessonId, String otp) {
+    public boolean verifyOtp(Long courseId, Long lessonId, Long studentId, String otp) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
-        return lesson.getOtp().equals(otp);
+        if (lesson.getOtp().equals(otp)){
+            attendanceService.saveAttendance(courseId, studentId);
+            return true;
+        }
+        return false;
     }
 }
 

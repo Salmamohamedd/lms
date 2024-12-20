@@ -102,8 +102,8 @@ public class StudentController {
 
     @PostMapping("/courses/{courseId}/lessons/{lessonId}/verifyOtp")
     @RolesAllowed({"STUDENT"})
-    public boolean verifyOtp(@PathVariable Long courseId, @PathVariable Long lessonId, @RequestParam String otp) {
-        return courseService.verifyOtp(courseId, lessonId, otp);
+    public boolean verifyOtp(@PathVariable Long courseId, @PathVariable Long lessonId, @RequestParam Long studentId, @RequestParam String otp) {
+        return courseService.verifyOtp(courseId, lessonId, studentId, otp);
     }
 
     ////////////////////////////////

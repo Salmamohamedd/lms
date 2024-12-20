@@ -34,18 +34,18 @@ public class PerformanceReportService {
         header.createCell(1).setCellValue("Assessment ID");
         header.createCell(2).setCellValue("Score");
         header.createCell(3).setCellValue("Feedback");
-//        header.createCell(4).setCellValue("Attendance %");
+        header.createCell(4).setCellValue("Attendance %");
 
         // Fetch Grades and Attendance
         List<Grades> gradesList = gradesRepository.findAllByCourseId(courseId);
-//        List<Attendance> attendanceList = attendanceRepository.findAllByCourseId(courseId);
+        List<Attendance> attendanceList = attendanceRepository.findAllByCourseId(courseId);
 
         // Create a map of attendance for quick lookup
-//        Map<Long, Double> attendanceMap = attendanceList.stream()
-//                .collect(Collectors.toMap(
-//                        Attendance::getStudentId,
-//                        attendance -> (double) attendance.getLessonsAttended() / attendance.getTotalLessons() * 100
-//                ));
+        Map<Long, Double> attendanceMap = attendanceList.stream()
+                .collect(Collectors.toMap(
+                        Attendance::getStudentId,
+                        attendance -> (double) attendance.getLessonsAttended() / attendance.getTotalLessons() * 100
+                ));
 
         // Fill Data Rows
         int rowIdx = 1;
@@ -56,8 +56,8 @@ public class PerformanceReportService {
             row.createCell(2).setCellValue(grade.getScore());
             row.createCell(3).setCellValue(grade.getFeedback());
 
-//            Double attendancePercentage = attendanceMap.getOrDefault(grade.getStudentId(), 0.0);
-//            row.createCell(4).setCellValue(attendancePercentage);
+            Double attendancePercentage = attendanceMap.getOrDefault(grade.getStudentId(), 0.0);
+            row.createCell(4).setCellValue(attendancePercentage);
         }
 
         // Write to ByteArrayOutputStream
