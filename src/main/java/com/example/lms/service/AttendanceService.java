@@ -21,15 +21,19 @@ public class AttendanceService {
         //get or create an attendance record
         Optional<Attendance> optionalAttendance = attendanceRepository.findAttendanceByStudentIdAndCourseId(studentId, courseId);
         Attendance attendance;
+        Optional<Course> course = courseRepository.findById(courseId);
+        int totalLessons = course.get().getLessons().size();
         //if an attendance record is found then get it
         if (optionalAttendance.isPresent()){
             attendance = optionalAttendance.get();
         }
+
         //if no record is found then create a new record
         else{
-            Optional<Course> course = courseRepository.findById(courseId);
-            int totalLessons = course.get().getLessons().size();
             attendance = new Attendance(studentId, courseId, totalLessons, 0);
+        }
+        if (totalLessons != attendance.getTotalLessons()){
+            attendance.setTotalLessons(totalLessons);
         }
         // Mark the lesson as attended if not already marked
         if (attendance.getLessonsAttended() < attendance.getTotalLessons()) {
