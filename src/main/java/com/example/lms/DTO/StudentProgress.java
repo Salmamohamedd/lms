@@ -12,5 +12,5 @@ public class StudentProgress {
     private Integer submittedAssignments;
     private Double averageQuizScore;
     private Double averageAssignmentScore;
-//    private Double attendancePercentage;
+    private Double attendancePercentage;
 }
