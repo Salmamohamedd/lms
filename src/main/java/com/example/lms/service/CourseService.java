@@ -71,11 +71,12 @@ public class CourseService {
         return getCourseById(courseId).getEnrolledStudents();
     }
 
-    public void generateOtpForLesson(Long courseId, Long lessonId) {
+    public String generateOtpForLesson(Long courseId, Long lessonId) {
         Course course = getCourseById(courseId);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
         lesson.setOtp(generateRandomOtp());  // Use a method to generate a random OTP
+        return lesson.getOtp();
     }
 
     private String generateRandomOtp() {

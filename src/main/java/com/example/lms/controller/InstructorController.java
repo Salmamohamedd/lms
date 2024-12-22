@@ -170,8 +170,8 @@ public class InstructorController {
 
     @PostMapping("/courses/{courseId}/lessons/{lessonId}/generateOtp")
     @RolesAllowed({"INSTRUCTOR"})
-    public void generateOtp(@PathVariable Long courseId, @PathVariable Long lessonId) {
-        courseService.generateOtpForLesson(courseId, lessonId);
+    public String generateOtp(@PathVariable Long courseId, @PathVariable Long lessonId) {
+       return courseService.generateOtpForLesson(courseId, lessonId);
     }
 
 
