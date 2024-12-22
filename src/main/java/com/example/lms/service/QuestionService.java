@@ -28,7 +28,6 @@ public class QuestionService {
         return questionRepository.findById(questionId)
                 .map(existingQuestion -> {
                     existingQuestion.setQuestionText(updatedQuestion.getQuestionText());
-                    existingQuestion.setType(updatedQuestion.getType());
                     existingQuestion.setOptions(updatedQuestion.getOptions());
                     existingQuestion.setCorrectAnswer(updatedQuestion.getCorrectAnswer());
                     return questionRepository.save(existingQuestion);
