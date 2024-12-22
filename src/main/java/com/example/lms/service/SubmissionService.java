@@ -1,9 +1,8 @@
+
+
 package com.example.lms.service;
 
-<<<<<<< Updated upstream
 import com.example.lms.DTO.QuizSubmissionRequest;
-=======
->>>>>>> Stashed changes
 import com.example.lms.model.Submission;
 import com.example.lms.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ public class SubmissionService {
 
     @Autowired
     private SubmissionRepository submissionRepository;
-<<<<<<< Updated upstream
     @Autowired
     private GradesService gradesService;
 
@@ -25,11 +23,6 @@ public class SubmissionService {
         if (!submission.getType().equalsIgnoreCase("assignment")){
             throw new IllegalStateException("This submission is not an assignment.");
         }
-=======
-
-    // Submit a new submission
-    public Submission submit(Submission submission) {
->>>>>>> Stashed changes
         return submissionRepository.save(submission);
     }
 
@@ -44,13 +37,9 @@ public class SubmissionService {
     public void deleteSubmission(Long submissionId) {
         submissionRepository.deleteById(submissionId);
     }
-<<<<<<< Updated upstream
 
     public Submission submitQuiz(QuizSubmissionRequest quizSubmissionRequest) {
         Submission submission = gradesService.saveQuizSubmission(quizSubmissionRequest);
         return gradesService.autoGradeQuiz(submission.getSubmissionId());
     }
 }
-=======
-}
->>>>>>> Stashed changes

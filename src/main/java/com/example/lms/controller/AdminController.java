@@ -1,11 +1,10 @@
 
 package com.example.lms.controller;
-
+//
 import com.example.lms.config.JwtService;
 import com.example.lms.model.User;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
-<<<<<<< Updated upstream
 import com.example.lms.service.ChartService;
 import com.example.lms.service.CourseService;
 
@@ -13,12 +12,10 @@ import java.io.IOException;
 import java.util.List;
 
 import com.example.lms.service.PerformanceReportService;
-=======
 import com.example.lms.service.CourseService;
 import java.util.List;
 import com.example.lms.repository.UserRepository;
 import com.example.lms.service.AdminService;
->>>>>>> Stashed changes
 import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +37,10 @@ public class AdminController {
     private JwtService jwtService;
     @Autowired
     private CourseService courseService;
-<<<<<<< Updated upstream
     @Autowired
     private PerformanceReportService performanceReportService;
     @Autowired
     private ChartService chartService;
-=======
->>>>>>> Stashed changes
 
     //performance analytics related endpoint
     @GetMapping("/report")

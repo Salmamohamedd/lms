@@ -33,10 +33,7 @@ public class Course {
         this.courseId = id;
     }
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 }
 
 
