@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 
 
 package com.example.lms.controller;
@@ -12,6 +13,17 @@ import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+=======
+package com.example.lms.controller;
+
+import com.example.lms.model.Course;
+import com.example.lms.model.Lesson;
+import com.example.lms.service.CourseService;
+import com.example.lms.model.Submission;
+import com.example.lms.service.SubmissionService;
+import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> Stashed changes
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -24,6 +36,7 @@ public class StudentController {
 
     @Autowired
     private CourseService courseService;
+<<<<<<< Updated upstream
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -67,6 +80,16 @@ public class StudentController {
     public Submission submitQuiz(@RequestBody QuizSubmissionRequest quizSubmissionRequest){
         return submissionService.submitQuiz(quizSubmissionRequest);
     }
+=======
+
+
+    @PostMapping("/submission/submit")
+    @RolesAllowed({"STUDENT"})
+    public Submission submit(@RequestBody Submission submission) {
+        return submissionService.submit(submission);
+    }
+
+>>>>>>> Stashed changes
 
     @GetMapping("/submission/{submissionId}")
     @RolesAllowed({"STUDENT"})
@@ -81,7 +104,10 @@ public class StudentController {
     }
 
 
+<<<<<<< Updated upstream
     /////////////////////////////////
+=======
+>>>>>>> Stashed changes
     // New course-related endpoints
 
     @GetMapping("/getCourses")
@@ -108,6 +134,7 @@ public class StudentController {
         return courseService.verifyOtp(courseId, lessonId, otp);
     }
 
+<<<<<<< Updated upstream
     ////////////////////////////////
     // profile-related endpoints
     @GetMapping("/viewStudentProfile")
@@ -137,6 +164,8 @@ public class StudentController {
         user.setId(student.getId());
         return ResponseEntity.ok(user);
     }
+=======
+>>>>>>> Stashed changes
 
 
 

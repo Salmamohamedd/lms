@@ -1,5 +1,6 @@
 package com.example.lms.controller;
 
+<<<<<<< Updated upstream
 import com.example.lms.DTO.StudentProgress;
 import com.example.lms.config.JwtService;
 
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.List;
+=======
+>>>>>>> Stashed changes
 
 import com.example.lms.model.Assessment;
 import com.example.lms.model.Question;
@@ -41,6 +44,7 @@ public class InstructorController {
 
     @Autowired
     private CourseService courseService;
+<<<<<<< Updated upstream
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -92,6 +96,8 @@ public class InstructorController {
 
     /////////////////////////
     //Assessments related endpoints
+=======
+>>>>>>> Stashed changes
 
     @PostMapping("/assessments/create")
     @RolesAllowed({"INSTRUCTOR"})
@@ -134,11 +140,14 @@ public class InstructorController {
     public Question updateQuestion(@PathVariable Long questionId, @RequestBody Question updatedQuestion) {
         return questionService.updateQuestion(questionId, updatedQuestion);
     }
+<<<<<<< Updated upstream
     @DeleteMapping("/questions/delete/{questionId}")
     @RolesAllowed({"INSTRUCTOR"})
     public void deleteQuestion(@PathVariable Long questionId) {
         questionService.deleteQuestion(questionId);
     }
+=======
+>>>>>>> Stashed changes
 
     ///////////////
 
@@ -173,6 +182,7 @@ public class InstructorController {
         courseService.generateOtpForLesson(courseId, lessonId);
     }
 
+<<<<<<< Updated upstream
 
     /////////////////////////////
     // profile-related endpoints
@@ -205,6 +215,8 @@ public class InstructorController {
     }
 
 
+=======
+>>>>>>> Stashed changes
 }
 
 
