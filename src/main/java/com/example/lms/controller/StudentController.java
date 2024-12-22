@@ -75,14 +75,6 @@ public class StudentController {
         return submissionService.submitQuiz(quizSubmissionRequest);
     }
 
-
-    @PostMapping("/submission/submit")
-    @RolesAllowed({"STUDENT"})
-    public Submission submit(@RequestBody Submission submission) {
-        return submissionService.submit(submission);
-    }
-
-
     @GetMapping("/submission/{submissionId}")
     @RolesAllowed({"STUDENT"})
     public Submission getSubmissionById(@PathVariable Long submissionId) {
