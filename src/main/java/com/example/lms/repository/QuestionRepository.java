@@ -41,9 +41,5 @@ public class QuestionRepository {
     public void deleteById(Long id) {
         questions.removeIf(question -> question.getQuestionId().equals(id));
     }
-<<<<<<< Updated upstream
 }
 
-=======
-}
->>>>>>> Stashed changes

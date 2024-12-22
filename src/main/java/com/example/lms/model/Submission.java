@@ -17,7 +17,6 @@ public class Submission {
     private String filePath;   // For assignments
     private Double score;      // For quiz or assignment
     private String feedback;
-<<<<<<< Updated upstream
     private String type;
 
     public String getType() {
@@ -28,8 +27,7 @@ public class Submission {
         this.type = type;
     }
 
-=======
->>>>>>> Stashed changes
+
 
     public Long getSubmissionId() {
         return submissionId;
@@ -79,9 +77,5 @@ public class Submission {
         this.feedback = feedback;
     }
 
-<<<<<<< Updated upstream
-}
 
-=======
 }
->>>>>>> Stashed changes
