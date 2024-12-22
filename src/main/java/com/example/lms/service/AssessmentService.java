@@ -32,8 +32,6 @@ public class AssessmentService {
     public Assessment updateAssessment(Long assessmentId, Assessment updatedAssessment) {
         Assessment existingAssessment = getAssessmentById(assessmentId);
         existingAssessment.setTitle(updatedAssessment.getTitle());
-        existingAssessment.setType(updatedAssessment.getType());
-        existingAssessment.setDateCreated(updatedAssessment.getDateCreated());
         return assessmentRepository.save(existingAssessment);
     }
 
