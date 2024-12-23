@@ -39,6 +39,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role; // Role: ADMIN, INSTRUCTOR, STUDENT
 
+    public User(String name, String email, String password,Role role) {
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+    }
+
     @Column(name = "email_notifications", nullable = false)
     private boolean emailNotifications = true;  // Default to true (can be changed by the user)
 
