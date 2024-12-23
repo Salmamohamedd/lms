@@ -36,8 +36,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user){
-    if(userRepository.findByEmail(user.getEmail()).isPresent()){
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(userRepository.findByEmail(user.getEmail()).isPresent() ||
+                user.getEmail() == null || user.getName() == null ||
+                user.getPassword() == null || user.getRole() == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User newUser = new User();
         newUser.setEmail(user.getEmail());
@@ -50,7 +52,7 @@ public class AuthController {
         response.put("token", token);
         response.put("user", user);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-}
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
