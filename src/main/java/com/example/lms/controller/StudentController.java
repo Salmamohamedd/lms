@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
 import com.example.lms.service.CourseService;
+import com.example.lms.service.NotificationService;
 import com.example.lms.model.Submission;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ public class StudentController {
     @Autowired
     private GradesService gradesService;
 
+    @Autowired
+    private NotificationService notificationService;
     //Grading related endpoint
     @GetMapping("/allGrades/{studentId}")
     @RolesAllowed({"STUDENT"})
@@ -145,6 +148,56 @@ public class StudentController {
         user.setId(student.getId());
         return ResponseEntity.ok(user);
     }
+    // Fetch system notifications for a student
+    @GetMapping("/notifications")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<List<Notification>> getNotifications(@RequestHeader("Authorization") String authorizationHeader,
+                                                               @RequestParam(required = false, defaultValue = "false") boolean unreadOnly) {
+        String token = authorizationHeader.substring(7); // Remove "Bearer "
+        String email = jwtService.extractClaim(token, "sub"); // Extract email from token
 
+        User student = userServiceImp.getUserByEmail(email);
+        List<Notification> notifications = notificationService.getNotificationsForUser(student.getId(), unreadOnly);
+
+        return ResponseEntity.ok(notifications);
+    }
+
+    // Update notification preferences
+    @PutMapping("/notifications/preferences")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<String> updateNotificationPreferences(@RequestHeader("Authorization") String authorizationHeader,
+                                                                @RequestBody NotificationPreferences preferences) {
+        String token = authorizationHeader.substring(7);
+        String email = jwtService.extractClaim(token, "sub");
+
+        User student = userServiceImp.getUserByEmail(email);
+        notificationService.updateNotificationPreferences(student.getId(), preferences);
+
+        return ResponseEntity.ok("Notification preferences updated successfully.");
+    }
+
+    // Mark a notification as read
+    @PutMapping("/notifications/{id}/read")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<String> markNotificationAsRead(@PathVariable Long id) {
+        notificationService.markAsRead(id);
+        return ResponseEntity.ok("Notification marked as read.");
+    }
+    @PostMapping("/courses/{courseId}/enroll")
+    @RolesAllowed({"STUDENT"})
+    public ResponseEntity<String> enrollInCourse(@PathVariable int courseId, @RequestHeader("Authorization") String authorizationHeader) {
+        // Enroll student in course
+        String token = authorizationHeader.substring(7);
+        String email = jwtService.extractClaim(token, "sub");
+        User student = userServiceImp.getUserByEmail(email);
+
+        // Trigger system notification
+        notificationService.triggerEnrollmentConfirmation(student.getId(), courseId);
+
+        // Send email notification
+        notificationService.sendEnrollmentEmail(student.getEmail(), courseId);
+
+        return ResponseEntity.ok("Student enrolled successfully!");
+    }
 
 }

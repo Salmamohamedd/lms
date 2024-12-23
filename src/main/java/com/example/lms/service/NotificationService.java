@@ -1,53 +1,85 @@
 package com.example.lms.service;
 
 import com.example.lms.model.Notification;
+import com.example.lms.model.User;
 import com.example.lms.repository.NotificationRepository;
+import com.example.lms.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.lms.model.NotificationPreferences;
 
 import java.util.List;
 
 @Service
 public class NotificationService {
 
-    private final NotificationRepository notificationRepository;
-
-    public NotificationService(NotificationRepository notificationRepository) {
-        this.notificationRepository = notificationRepository;
-    }
-
-    // Fetch notifications for a recipient
-    public List<Notification> getNotificationsByRecipient(Long recipientId, boolean unreadOnly) {
+    @Autowired
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
+    public List<Notification> getNotificationsForUser(int userId, boolean unreadOnly) {
         if (unreadOnly) {
-            return notificationRepository.findByRecipientIdAndReadFalse(recipientId);
-        } else {
-            return notificationRepository.findByRecipientId(recipientId);
+            return notificationRepository.findByUserIdAndIsRead(userId, false);
         }
+        return notificationRepository.findByUserId(userId);
     }
 
-    // Mark a specific notification as read
-    public Notification markNotificationAsRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+    public void updateNotificationPreferences(int userId, NotificationPreferences preferences) {
+
+        // Fetch the user entity by ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
+
+        // Update the user's notification preferences
+        user.setEmailNotifications(preferences.isEmailNotifications());
+        user.setStudentEnrollments(preferences.isStudentEnrollments());
+        user.setCourseUpdates(preferences.isCourseUpdates());
+
+        // Save the updated user entity
+        userRepository.save(user);
+    }
+
+
+    public void markAsRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                () -> new RuntimeException("Notification not found")
+        );
         notification.setRead(true);
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
     }
 
-    // Mark all notifications for a recipient as read
-    public void markAllNotificationsAsRead(Long recipientId) {
-        List<Notification> notifications = notificationRepository.findByRecipientIdAndReadFalse(recipientId);
-        notifications.forEach(notification -> notification.setRead(true));
-        notificationRepository.saveAll(notifications);
+    // Trigger system notification for enrollment confirmation
+    public void triggerEnrollmentConfirmation(int studentId, int courseId) {
+        Notification notification = new Notification();
+        notification.setUserId(studentId);
+        notification.setMessage("You have successfully enrolled in the course with ID " + courseId);
+        notification.setRead(false); // Set notification as unread
+        notificationRepository.save(notification);
     }
 
-    // Create a new notification
-    public Notification createNotification(Notification notification) {
-        notification.setRead(false); // Default to unread
-        notification.setTimestamp(java.time.LocalDateTime.now());
-        return notificationRepository.save(notification);
+    // Trigger system notification for course update
+    public void triggerCourseUpdateNotification(int instructorId, Long courseId) {
+        Notification notification = new Notification();
+        notification.setUserId(instructorId);
+        notification.setMessage("The course with ID " + courseId + " has been updated.");
+        notification.setRead(false); // Set notification as unread
+        notificationRepository.save(notification);
     }
 
-    // Delete a notification
-    public void deleteNotification(Long notificationId) {
-        notificationRepository.deleteById(notificationId);
+    // Send email notification for enrollment confirmation
+    public void sendEnrollmentEmail(String studentEmail, int courseId) {
+        String subject = "Enrollment Confirmation";
+        String body = "You have successfully enrolled in the course with ID " + courseId;
+        emailService.sendEmail(studentEmail, subject, body);
     }
+
+    // Send email notification for course update
+    public void sendCourseUpdateEmail(String instructorEmail, Long courseId) {
+        String subject = "Course Update";
+        String body = "The course with ID " + courseId + " has been updated.";
+        emailService.sendEmail(instructorEmail, subject, body);
+    }
+
 }

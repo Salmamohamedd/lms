@@ -13,8 +13,14 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long courseId;
+
+
+
     private String title;
     private String description;
+
+
+
     private String duration;
     @ElementCollection
     private List<String> mediaFiles = new ArrayList<>();
@@ -33,7 +39,20 @@ public class Course {
         this.courseId = id;
     }
 
+    public String getDuration() {
+        return duration;
+    }
 
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
 
 

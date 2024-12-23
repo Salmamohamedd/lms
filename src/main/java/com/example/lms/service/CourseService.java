@@ -4,6 +4,7 @@ package com.example.lms.service;
 
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
+import com.example.lms.model.User;
 import com.example.lms.repository.CourseRepository;
 import com.example.lms.repository.LessonRepository;
 
@@ -92,6 +93,9 @@ public class CourseService {
             return true;
         }
         return false;
+    }
+    public Course saveCourse(Course course) {
+        return courseRepository.save(course);
     }
 }
 

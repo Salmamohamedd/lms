@@ -8,10 +8,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-
-    // Find all notifications for a recipient
-    List<Notification> findByRecipientId(Long recipientId);
-
-    // Find unread notifications for a recipient
-    List<Notification> findByRecipientIdAndReadFalse(Long recipientId);
+    List<Notification> findByUserId(int userId);
+    List<Notification> findByUserIdAndIsRead(int userId, boolean isRead);
 }
