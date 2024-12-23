@@ -81,7 +81,7 @@ public class GradesService {
         if (score > 80.0 && score <= 100.0){
             feedback = "Excellent";
         }
-        else if(score > 50.0 && score <= 80.0){
+        else if(score >= 50.0 && score <= 80.0){
             feedback = "Good";
         }
         else{

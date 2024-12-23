@@ -4,19 +4,14 @@ import com.example.lms.config.JwtService;
 import com.example.lms.model.User;
 import com.example.lms.model.Course;
 import com.example.lms.model.Lesson;
-import com.example.lms.service.ChartService;
-import com.example.lms.service.CourseService;
+import com.example.lms.service.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.example.lms.service.PerformanceReportService;
-
 import com.example.lms.service.CourseService;
 import java.util.List;
 import com.example.lms.repository.UserRepository;
-import com.example.lms.service.AdminService;
-import com.example.lms.service.UserServiceImp;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +36,8 @@ public class AdminController {
     private PerformanceReportService performanceReportService;
     @Autowired
     private ChartService chartService;
+    @Autowired
+    private AttendanceService attendanceService;
 
 
     //performance analytics related endpoint
@@ -64,7 +61,13 @@ public class AdminController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(chart);
     }
-
+    /////////////////////////////
+    //attendance related endpoint
+    @GetMapping("/attendance/{attendanceId}")
+    @RolesAllowed({"ADMIN"})
+    public void updateAttendance(@PathVariable Long attendanceId, @RequestParam int totalLessons, @RequestParam int lessonsAttended){
+        attendanceService.updateAttendance(attendanceId, totalLessons, lessonsAttended);
+    }
     ///////////////////////////
     // user management endpoints
     @PostMapping("/createUser")
