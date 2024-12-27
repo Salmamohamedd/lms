@@ -21,7 +21,7 @@ public class JwtService {
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
     }
-
+    //use in sign and verify jwt
     private Key getSignKey(){
         byte[] key = Decoders.BASE64.decode("413F4428472B4B6250655368566D5970337336763979244226452948404D6351");
         return Keys.hmacShaKeyFor(key);
@@ -48,9 +48,7 @@ public class JwtService {
         return buildToken(extraClaims, userDetails, 1000 * 60 * 60 * 24);
     }
 
-//    public String generateToken(UserDetails userDetails){
-//        return generateToken(new HashMap<>(), userDetails);
-//    }
+
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         final String username = extractUsername(token);
@@ -76,7 +74,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .claim("role",
                         userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                .setIssuedAt(new Date())
+                .setIssuedAt(new Date())//timestamp when token created
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey())
                 .compact();

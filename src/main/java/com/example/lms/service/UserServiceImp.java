@@ -28,12 +28,7 @@ public class UserServiceImp implements UserService{
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-//    public void addUser(User user){
-//        if(userRepository.findByEmail(user.getEmail()).isPresent()){
-//            throw new RuntimeException("Email already exists");
-//        }
-//        userRepository.save(user);
-//    }
+
 
     @Override
     public User getUserById(int id) {

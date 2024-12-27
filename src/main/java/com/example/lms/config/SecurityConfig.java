@@ -36,32 +36,21 @@ public class SecurityConfig {
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/students/**").hasAnyRole(Role.STUDENT.name(), Role.ADMIN.name(), Role.INSTRUCTOR.name())
-                .requestMatchers("/api/instructors/**").hasAnyRole(Role.ADMIN.name(), Role.INSTRUCTOR.name())
-                .requestMatchers("/api/admins/**").hasAnyRole(Role.ADMIN.name())
-                .anyRequest().authenticated())
+                .requestMatchers("/api/students/**").hasAnyRole(Role.STUDENT.name(), Role.ADMIN.name(), Role.INSTRUCTOR.name())//access to all
+                .requestMatchers("/api/instructors/**").hasAnyRole(Role.ADMIN.name(), Role.INSTRUCTOR.name())//access to admin and instructor
+                .requestMatchers("/api/admins/**").hasAnyRole(Role.ADMIN.name())//access to admin only
+                .anyRequest().authenticated())//All other endpoints require authentication
 
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless session
-
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless session , it rely on tokens not server side sessions
+                //exception if unauthorized user
                 .exceptionHandling(
                         e -> e.authenticationEntryPoint(
                                 (request, response, authException) -> response.setStatus(401)
                         )
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter before UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter before UsernamePasswordAuthentication to ensure that requet is authenticated based on token
 
-//        return http.csrf(csrf -> csrf.disable()) // there is no session on the server side (stateless), CSRF protection doesn't apply
-//                .authorizeHttpRequests()
-//                .requestMatchers("/login", "/register").permitAll() // Allows unrestricted (public) access to the /login and /register endpoints.
-////                        .requestMatchers("/admin/**").hasRole("ADMIN") // Restricted to ADMIN
-////                        .requestMatchers("/instructor/**").hasRole("INSTRUCTOR") // Restricted to INSTRUCTOR
-////                        .requestMatchers("/student/**").hasRole("STUDENT") // Restricted to STUDENT
-//                        .anyRequest().permitAll()
-//                 // Ensures that every other request to the server requires authentication
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-////                .httpBasic(Customizer.withDefaults()) // HTTP Basic Authentication
-//                .build();
         return http.build();
     }
 

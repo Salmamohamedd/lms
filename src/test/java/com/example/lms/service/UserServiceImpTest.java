@@ -47,6 +47,7 @@ class UserServiceImpTest {
         User foundUser = userService.getUserByEmail(user.getEmail());
         assertNotNull(foundUser);
         assertEquals("User1", foundUser.getName());
+        assertEquals("test@gmail.com", foundUser.getEmail());
     }
 
     @Test
