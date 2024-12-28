@@ -62,7 +62,9 @@ public class InstructorController {
     @PostMapping("/gradeAss")
     @RolesAllowed({"INSTRUCTOR"})
     public Submission gradeAssignment(@RequestBody Submission submission){
-        return gradesService.gradeAssignment(submission.getSubmissionId(), submission.getScore(), submission.getFeedback());
+        Submission gradedSubmission = gradesService.gradeAssignment(submission.getSubmissionId(), submission.getScore(), submission.getFeedback());
+        notificationService.triggerGradedAssignmentNotification(gradedSubmission.getStudentId(), submission.getSubmissionId());
+        return gradedSubmission;
     }
     ////////////////////////////
     //Performance tracking related endpoints
@@ -175,7 +177,7 @@ public class InstructorController {
     @PostMapping("/courses/{courseId}/lessons/{lessonId}/generateOtp")
     @RolesAllowed({"INSTRUCTOR"})
     public String generateOtp(@PathVariable Long courseId, @PathVariable Long lessonId) {
-       return courseService.generateOtpForLesson(courseId, lessonId);
+        return courseService.generateOtpForLesson(courseId, lessonId);
     }
 
 
@@ -209,89 +211,101 @@ public class InstructorController {
         return ResponseEntity.ok(user);
     }
 
-    // Fetch system notifications for an instructor
+    // Notification-related endpoints
     @GetMapping("/notifications")
     @RolesAllowed({"INSTRUCTOR"})
-    public ResponseEntity<List<Notification>> getNotifications(@RequestHeader("Authorization") String authorizationHeader,
-                                                               @RequestParam(required = false, defaultValue = "false") boolean unreadOnly) {
-        String token = authorizationHeader.substring(7); // Remove "Bearer "
-        String email = jwtService.extractClaim(token, "sub"); // Extract email from token
-
-        User student = userServiceImp.getUserByEmail(email);
-        List<Notification> notifications = notificationService.getNotificationsForUser(student.getId(), unreadOnly);
+    public ResponseEntity<List<Notification>> getNotifications(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(required = false, defaultValue = "false") boolean unreadOnly) {
+        String token = authorizationHeader.substring(7);
+        String email = jwtService.extractClaim(token, "sub");
+        User instructor = userServiceImp.getUserByEmail(email);
+        List<Notification> notifications = notificationService.getNotificationsForUser(instructor.getId(), unreadOnly);
 
         return ResponseEntity.ok(notifications);
     }
 
-    // Update notification preferences
     @PutMapping("/notifications/preferences")
     @RolesAllowed({"INSTRUCTOR"})
-    public ResponseEntity<String> updateNotificationPreferences(@RequestHeader("Authorization") String authorizationHeader,
-                                                                @RequestBody NotificationPreferences preferences) {
+    public ResponseEntity<String> updateNotificationPreferences(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody NotificationPreferences preferences) {
         String token = authorizationHeader.substring(7);
         String email = jwtService.extractClaim(token, "sub");
-
         User instructor = userServiceImp.getUserByEmail(email);
         notificationService.updateNotificationPreferences(instructor.getId(), preferences);
 
         return ResponseEntity.ok("Notification preferences updated successfully.");
     }
 
-    // Mark a notification as read
-    @PutMapping("/notifications/{id}/read")
+
+
+    // Enrollment notification endpoint
+    @PostMapping("/notifications/enrollment")
     @RolesAllowed({"INSTRUCTOR"})
-    public ResponseEntity<String> markNotificationAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
-        return ResponseEntity.ok("Notification marked as read.");
-    }
+    public ResponseEntity<String> triggerEnrollmentNotification(@RequestParam int studentId, @RequestParam long courseId) {
+        User student = userServiceImp.getUserById(studentId);
+        Course course = courseService.getCourseById(courseId);
+        notificationService.triggerEnrollmentConfirmation(studentId, courseId);
+        return ResponseEntity.ok("Enrollment notification successfully for student: "
+                + student.getName() + " in course: " + course.getTitle());    }
+
+
+    // Course update notification
     @PostMapping("/courses/{courseId}/update")
     @RolesAllowed({"INSTRUCTOR"})
-    public ResponseEntity<String> updateCourse(@PathVariable Long courseId,
-                                               @RequestBody Course updatedCourse,
-                                               @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<String> updateCourse(
+            @PathVariable Long courseId,
+            @RequestBody Course updatedCourse,
+            @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            // Extract token and email
-            String token = authorizationHeader.substring(7); // Remove "Bearer " from token
-            String email = jwtService.extractClaim(token, "sub"); // Extract the email from JWT
+            // Check and extract token
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Authorization token is missing or invalid.");
+            }
+            String token = authorizationHeader.substring(7); // Remove "Bearer "
+            String email = jwtService.extractClaim(token, "sub");
             User instructor = userServiceImp.getUserByEmail(email);
 
-            if (instructor == null || !instructor.getRole().equals("INSTRUCTOR")) {
+            // Check if the user is an INSTRUCTOR
+            if (!instructor.getRole().equals("INSTRUCTOR")) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("You are not authorized to update this course.");
             }
 
-            // Check if the course exists
+            // Get the existing course and update it
             Course existingCourse = courseService.getCourseById(courseId);
             if (existingCourse == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found.");
             }
 
-            // Update course details
             existingCourse.setTitle(updatedCourse.getTitle());
             existingCourse.setDescription(updatedCourse.getDescription());
-            // Optionally update other fields like lessons, media files, etc.
-
-            // Save the updated course to the database
             courseService.saveCourse(existingCourse);
 
-            // Trigger system notification for course update
+            // Trigger course update notification and send email
             notificationService.triggerCourseUpdateNotification(instructor.getId(), courseId);
-
-            // Send email notification to the instructor
             notificationService.sendCourseUpdateEmail(instructor.getEmail(), courseId);
 
             return ResponseEntity.ok("Course updated successfully!");
+
         } catch (Exception e) {
-            // Handle any unexpected errors
+            e.printStackTrace();  // Consider logging to a file or a monitoring service
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while updating the course: " + e.getMessage());
         }
     }
 
-
+    @PostMapping("/courses/{courseId}/send-update")
+    @RolesAllowed({"INSTRUCTOR"})
+    public ResponseEntity<String> sendCourseUpdate(@PathVariable Long courseId,
+                                                   @RequestParam String updateMessage,
+                                                   @RequestParam List<Long> studentIds) {
+        for (Long studentId : studentIds) {
+            notificationService.triggerCourseUpdateNotification(studentId, courseId, updateMessage);
+        }
+        return ResponseEntity.ok("Course updates sent successfully.");
+    }
 
 }
-
-
-
-

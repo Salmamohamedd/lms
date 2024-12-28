@@ -69,14 +69,36 @@ public class StudentController {
     @PostMapping("/submission/submit-assignment")
     @RolesAllowed({"STUDENT"})
     public Submission submitAssignment(@RequestBody Submission submission) {
-        return submissionService.submitAssignment(submission);
+        Submission submitted = submissionService.submitAssignment(submission);
+        notificationService.triggerAssignmentSubmissionNotification(submitted.getStudentId(), submitted.getAssessmentId());
+
+        return submitted;
     }
 
     @PostMapping("/submission/submit-quiz")
     @RolesAllowed({"STUDENT"})
-    public Submission submitQuiz(@RequestBody QuizSubmissionRequest quizSubmissionRequest){
-        return submissionService.submitQuiz(quizSubmissionRequest);
+    public Submission submitQuiz(@RequestBody QuizSubmissionRequest quizSubmissionRequest) {
+        try {
+            if (quizSubmissionRequest.getQuizId() == null ||
+                    quizSubmissionRequest.getStudentId() == null ||
+                    quizSubmissionRequest.getStudentAnswers().isEmpty()) {
+                throw new IllegalArgumentException("Invalid quiz submission request");
+            }
+
+            Submission submitted = submissionService.submitQuiz(quizSubmissionRequest);
+
+            if (submitted.getStudentId() != null && submitted.getAssessmentId() != null) {
+                notificationService.triggerQuizSubmissionNotification(submitted.getStudentId(), submitted.getAssessmentId());
+            }
+
+            return submitted;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error processing quiz submission: " + e.getMessage());
+        }
     }
+
 
     @GetMapping("/submission/{submissionId}")
     @RolesAllowed({"STUDENT"})
@@ -148,7 +170,8 @@ public class StudentController {
         user.setId(student.getId());
         return ResponseEntity.ok(user);
     }
-    // Fetch system notifications for a student
+
+    ////////////////////////////////
     @GetMapping("/notifications")
     @RolesAllowed({"STUDENT"})
     public ResponseEntity<List<Notification>> getNotifications(@RequestHeader("Authorization") String authorizationHeader,
@@ -162,20 +185,6 @@ public class StudentController {
         return ResponseEntity.ok(notifications);
     }
 
-    // Update notification preferences
-    @PutMapping("/notifications/preferences")
-    @RolesAllowed({"STUDENT"})
-    public ResponseEntity<String> updateNotificationPreferences(@RequestHeader("Authorization") String authorizationHeader,
-                                                                @RequestBody NotificationPreferences preferences) {
-        String token = authorizationHeader.substring(7);
-        String email = jwtService.extractClaim(token, "sub");
-
-        User student = userServiceImp.getUserByEmail(email);
-        notificationService.updateNotificationPreferences(student.getId(), preferences);
-
-        return ResponseEntity.ok("Notification preferences updated successfully.");
-    }
-
     // Mark a notification as read
     @PutMapping("/notifications/{id}/read")
     @RolesAllowed({"STUDENT"})
@@ -183,21 +192,17 @@ public class StudentController {
         notificationService.markAsRead(id);
         return ResponseEntity.ok("Notification marked as read.");
     }
-    @PostMapping("/courses/{courseId}/enroll")
+    @PostMapping("/graded-assignment")
     @RolesAllowed({"STUDENT"})
-    public ResponseEntity<String> enrollInCourse(@PathVariable int courseId, @RequestHeader("Authorization") String authorizationHeader) {
-        // Enroll student in course
-        String token = authorizationHeader.substring(7);
-        String email = jwtService.extractClaim(token, "sub");
-        User student = userServiceImp.getUserByEmail(email);
+    public ResponseEntity<String> gradeAssignment(@RequestParam Long studentId,
+                                                  @RequestParam Long assignmentId,
+                                                  @RequestParam Double grade,
+                                                  @RequestParam String comment) {
+        gradesService.gradeAssignment(studentId, grade, comment);
 
-        // Trigger system notification
-        notificationService.triggerEnrollmentConfirmation(student.getId(), courseId);
+        notificationService.triggerGradedAssignmentNotification(studentId, assignmentId);
 
-        // Send email notification
-        notificationService.sendEnrollmentEmail(student.getEmail(), courseId);
-
-        return ResponseEntity.ok("Student enrolled successfully!");
+        return ResponseEntity.ok("Assignment graded .");
     }
 
 }
